@@ -9,14 +9,6 @@ turtles-own [
   numberOfCollectedPackets
 ]
 
-patches-own [
-  chemical             ;; amount of chemical on this patch
-  food                 ;; amount of food on this patch (0, 1, or 2)
-  nest?                ;; true on nest patches, false elsewhere
-  nest-scent           ;; number that is higher closer to the nest
-  food-source-number   ;; number (1, 2, or 3) to identify the food sources
-]
-
 globals
 [
   currentNumberObjects
@@ -352,7 +344,7 @@ numberObjects
 numberObjects
 0
 100
-50.0
+100.0
 1
 1
 NIL
@@ -394,7 +386,7 @@ numberPackets
 numberPackets
 0
 10
-10.0
+5.0
 1
 1
 NIL

@@ -12,6 +12,7 @@ turtles-own [
 globals
 [
   currentNumberObjects
+  ticksToZeroObjects
 ]
 
 to bigSetup
@@ -42,6 +43,7 @@ end
 to setup-objects
   clear-patches
   set currentNumberObjects numberObjects
+  set ticksToZeroObjects 0
   ask patches
   [
     set pcolor blue + random 2
@@ -104,6 +106,8 @@ to go
   ;; animation, substitute the following line instead:
   ;;   ask turtles [ fd 1 ]
   tick
+  set ticksToZeroObjects ticksToZeroObjects + 1
+  if currentNumberObjects = 0 [ stop ]
 end
 
 to move  ;; turtle procedure
@@ -273,7 +277,7 @@ numberAgents
 numberAgents
 1.0
 1000.0
-198.0
+1000.0
 1.0
 1
 NIL

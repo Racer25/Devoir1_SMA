@@ -6,14 +6,32 @@ turtles-own [
   cohesionForce
   flockingForce
   speedMax
+  numberOfCollectedPackets
+]
+
+patches-own [
+  chemical             ;; amount of chemical on this patch
+  food                 ;; amount of food on this patch (0, 1, or 2)
+  nest?                ;; true on nest patches, false elsewhere
+  nest-scent           ;; number that is higher closer to the nest
+  food-source-number   ;; number (1, 2, or 3) to identify the food sources
+]
+
+globals
+[
+  currentNumberObjects
 ]
 
 
 to setup
-  clear-all
-  create-turtles population
-    [ set color yellow - 2 + random 7  ;; random shades look nice
-      set size 1.5  ;; easier to see
+  set currentNumberObjects numberObjects
+  clear-all-plots
+  clear-turtles
+  create-turtles numberAgents
+    [
+      set shape "boat 3"
+      set color yellow - 2 + random 7  ;; random shades look nice
+      set size 4  ;; easier to see
       setxy random-xcor random-ycor
       set nearbyTurtles no-turtles
       set flockingForce [0 0]
@@ -21,12 +39,56 @@ to setup
       set speed replace-item 0 speed (0.2 * sin heading)
       set speed replace-item 1 speed (0.2 * cos heading)
       set speedMax 2
+      set numberOfCollectedPackets 0
     ]
   reset-ticks
 end
 
+to setup-objects
+  clear-patches
+  ask patches
+  [
+    set pcolor blue + random 2
+  ]
+  ifelse objectStrategy = "byRandom"
+  [
+    repeat numberObjects
+    [
+      ask one-of patches
+      [set pcolor red]
+    ]
+  ]
+  [
+    let n numberObjects / numberPackets
+    repeat numberPackets
+    [
+      ask one-of patches
+      [
+        let nearbyObjects other patches in-radius packetRadius
+        ask n-of n nearbyObjects
+       [
+         set pcolor red
+       ]
+      ]
+    ]
+  ]
+
+end
+
+to pickUp
+  if pcolor = red [
+    set pcolor blue + random 2
+    set numberOfCollectedPackets numberOfCollectedPackets + 1
+    set currentNumberObjects currentNumberObjects - 1
+  ]
+end
+
 to go
-  ask turtles [ move ]
+  ask turtles
+  [
+    pickUp
+    move
+  ]
   ;; the following line is used to make the turtles
   ;; animate more smoothly.
   repeat 5 [ ask turtles
@@ -36,11 +98,11 @@ to go
   ]
   ask one-of turtles
   [
-    print word "separationForce= "  separationForce
-    print word "alignementForce= "  alignementForce
-    print word "cohesionForce= "  cohesionForce
+    ;;print word "separationForce= "  separationForce
+    ;;print word "alignementForce= "  alignementForce
+    ;;print word "cohesionForce= "  cohesionForce
 
-    print word "speed= "  speed
+    ;;print word "speed= "  speed
   ]
   ;; for greater efficiency, at the expense of smooth
   ;; animation, substitute the following line instead:
@@ -211,8 +273,8 @@ SLIDER
 51
 232
 84
-population
-population
+numberAgents
+numberAgents
 1.0
 1000.0
 208.0
@@ -222,40 +284,40 @@ NIL
 HORIZONTAL
 
 SLIDER
-53
-165
-225
-198
+9
+183
+181
+216
 a
 a
 0
 1
-1.0
+0.7
 0.1
 1
 Separation Weight
 HORIZONTAL
 
 SLIDER
-66
+9
 216
-238
+181
 249
 b
 b
 0
 1
-1.0
+0.7
 0.1
 1
 Alignement Weight
 HORIZONTAL
 
 SLIDER
-47
-268
-219
-301
+9
+249
+181
+282
 c
 c
 0
@@ -280,6 +342,96 @@ vision
 1
 NIL
 HORIZONTAL
+
+SLIDER
+25
+330
+197
+363
+numberObjects
+numberObjects
+0
+100
+50.0
+1
+1
+NIL
+HORIZONTAL
+
+BUTTON
+66
+133
+174
+166
+setup-objects
+setup-objects
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+CHOOSER
+26
+372
+164
+417
+objectStrategy
+objectStrategy
+"byRandom" "byPackets"
+1
+
+SLIDER
+26
+430
+198
+463
+numberPackets
+numberPackets
+0
+10
+10.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+26
+461
+198
+494
+packetRadius
+packetRadius
+0
+10
+3.0
+1
+1
+NIL
+HORIZONTAL
+
+PLOT
+792
+130
+1225
+342
+Remaining objects
+Ticks
+Number of objects
+0.0
+100.0
+0.0
+100.0
+true
+true
+"" ""
+PENS
+"default" 1.0 0 -16777216 true "" "plot currentNumberObjects"
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -400,6 +552,15 @@ arrow
 true
 0
 Polygon -7500403 true true 150 0 0 150 105 150 105 293 195 293 195 150 300 150
+
+boat 3
+false
+0
+Polygon -1 true false 63 162 90 207 223 207 290 162
+Rectangle -6459832 true false 150 32 157 162
+Polygon -13345367 true false 150 34 131 49 145 47 147 48 149 49
+Polygon -7500403 true true 158 37 172 45 188 59 202 79 217 109 220 130 218 147 204 156 158 156 161 142 170 123 170 102 169 88 165 62
+Polygon -7500403 true true 149 66 142 78 139 96 141 111 146 139 148 147 110 147 113 131 118 106 126 71
 
 box
 false

@@ -14,10 +14,13 @@ globals
   currentNumberObjects
 ]
 
+to bigSetup
+  setup
+  setup-objects
+  clear-all-plots
+end
 
 to setup
-  set currentNumberObjects numberObjects
-  clear-all-plots
   clear-turtles
   create-turtles numberAgents
     [
@@ -38,6 +41,7 @@ end
 
 to setup-objects
   clear-patches
+  set currentNumberObjects numberObjects
   ask patches
   [
     set pcolor blue + random 2
@@ -269,7 +273,7 @@ numberAgents
 numberAgents
 1.0
 1000.0
-208.0
+198.0
 1.0
 1
 NIL
@@ -351,10 +355,10 @@ NIL
 HORIZONTAL
 
 BUTTON
-66
-133
-174
-166
+8
+130
+116
+163
 setup-objects
 setup-objects
 NIL
@@ -424,6 +428,40 @@ true
 "" ""
 PENS
 "default" 1.0 0 -16777216 true "" "plot currentNumberObjects"
+
+BUTTON
+947
+350
+1032
+383
+Clear Plot
+clear-all-plots
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+122
+130
+202
+163
+bigSetup
+bigSetup
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
 
 @#$#@#$#@
 ## WHAT IS IT?

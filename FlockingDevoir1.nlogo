@@ -52,23 +52,58 @@ to setup-objects
   [
     repeat numberObjects
     [
-      ask one-of patches
-      [set pcolor red]
+      let bool true
+      while [bool]
+      [
+        ask one-of patches
+        [
+          if pcolor != red
+          [
+            set pcolor red
+            set bool false
+          ]
+        ]
+      ]
     ]
   ]
   [
     let n numberObjects / numberPackets
-    repeat numberPackets
+    let  reste numberObjects mod numberPackets
+    repeat numberPackets - 1
     [
-      ask one-of patches
-      [
-        let nearbyObjects other patches in-radius packetRadius
-        ask n-of n nearbyObjects
-       [
-         set pcolor red
-       ]
-      ]
+      let bool true
+      while [bool]
+        [
+          ask one-of patches
+          [
+            let nearbyObjects other patches in-radius (ceiling sqrt ( n / pi ) + 1)
+            ask n-of n nearbyObjects
+            [
+              if pcolor != red
+              [
+                set pcolor red
+                set bool false
+              ]
+            ]
+          ]
+        ]
     ]
+    let bool true
+      while [bool]
+        [
+          ask one-of patches
+          [
+            let nearbyObjects other patches in-radius (ceiling sqrt ( ( n + reste ) / pi ) + 1)
+            ask n-of ( n + reste ) nearbyObjects
+            [
+              if pcolor != red
+              [
+                set pcolor red
+                set bool false
+              ]
+            ]
+          ]
+        ]
   ]
 
 end
@@ -107,7 +142,9 @@ to go
   ;;   ask turtles [ fd 1 ]
   tick
   set ticksToZeroObjects ticksToZeroObjects + 1
-  if currentNumberObjects = 0 [ stop ]
+  if currentNumberObjects = 0 [
+    stop
+  ]
 end
 
 to move  ;; turtle procedure
@@ -210,11 +247,11 @@ end
 GRAPHICS-WINDOW
 250
 10
-755
-516
+676
+437
 -1
 -1
-7.0
+5.9
 1
 10
 1
@@ -277,7 +314,7 @@ numberAgents
 numberAgents
 1.0
 1000.0
-1000.0
+200.0
 1.0
 1
 NIL
@@ -292,7 +329,7 @@ a
 a
 0
 1
-0.7
+0.5
 0.1
 1
 Separation Weight
@@ -307,7 +344,7 @@ b
 b
 0
 1
-0.7
+0.2
 0.1
 1
 Alignement Weight
@@ -322,7 +359,7 @@ c
 c
 0
 1
-0.3
+0.4
 0.1
 1
 Cohesion Weight
@@ -350,7 +387,7 @@ SLIDER
 363
 numberObjects
 numberObjects
-0
+10
 100
 100.0
 1
@@ -392,24 +429,9 @@ SLIDER
 463
 numberPackets
 numberPackets
-0
-10
-5.0
 1
-1
-NIL
-HORIZONTAL
-
-SLIDER
-26
-461
-198
-494
-packetRadius
-packetRadius
-0
 10
-3.0
+9.0
 1
 1
 NIL
@@ -466,6 +488,28 @@ NIL
 NIL
 NIL
 1
+
+MONITOR
+850
+392
+907
+437
+Ticks
+ticksToZeroObjects
+17
+1
+11
+
+MONITOR
+1005
+392
+1144
+437
+currentNumberObjects
+currentNumberObjects
+17
+1
+11
 
 @#$#@#$#@
 ## WHAT IS IT?

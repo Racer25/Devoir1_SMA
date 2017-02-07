@@ -41,6 +41,7 @@ to setup
       set speed replace-item 1 speed (0.2 * cos heading)
       set speedMax 2
       set numberOfCollectedPackets 0
+      ;;set groupTurtles 0
     ]
   reset-ticks
 end
@@ -52,6 +53,7 @@ to setup-objects
   ask patches
   [
     set pcolor blue + random 2
+    ;;set groupPatches 0
   ]
   ifelse objectStrategy = "byRandom"
   [
@@ -62,10 +64,11 @@ to setup-objects
       [
         ask one-of patches
         [
-          if pcolor != red
+          if pcolor != red  ;; groupPatches != 1
           [
             set pcolor red
             set bool false
+            ;;set groupPatches 1
           ]
         ]
       ]
@@ -87,7 +90,7 @@ to setup-objects
             set rayonsCroises false
             ask nearbyObjects
             [
-              if pcolor = red
+              if pcolor = red ;;groupPatches = 1
               [
                 set rayonsCroises true
               ]
@@ -97,6 +100,7 @@ to setup-objects
               ask n-of n nearbyObjects
               [
                 set pcolor red
+                ;;set groupPatches 1
               ]
             ]
           ]
@@ -113,7 +117,7 @@ to setup-objects
           set rayonsCroises false
           ask nearbyObjects
           [
-            if pcolor = red
+            if pcolor = red ;;groupPatches = 1
             [
              set rayonsCroises true
             ]
@@ -123,6 +127,7 @@ to setup-objects
             ask n-of ( n + reste) nearbyObjects
             [
               set pcolor red
+              ;;set groupPatches 1
             ]
           ]
         ]
@@ -132,8 +137,10 @@ to setup-objects
 end
 
 to pickUp
-  if pcolor = red [
+  if pcolor = red ;;groupPatches = 1
+  [
     set pcolor blue + random 2
+    ;;set groupPatches 0
     set numberOfCollectedPackets numberOfCollectedPackets + 1
     set currentNumberObjects currentNumberObjects - 1
   ]

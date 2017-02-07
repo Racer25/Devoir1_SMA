@@ -71,39 +71,57 @@ to setup-objects
     let  reste numberObjects mod numberPackets
     repeat numberPackets - 1
     [
-      let bool true
-      while [bool]
+      let rayonsCroises false
+      let firstTime true
+      while [ rayonsCroises = true or firstTime = true]
         [
+          set firstTime false
           ask one-of patches
           [
             let nearbyObjects other patches in-radius (ceiling sqrt ( n / pi ) + 1)
-            ask n-of n nearbyObjects
+            set rayonsCroises false
+            ask nearbyObjects
             [
-              if pcolor != red
+              if pcolor = red
+              [
+                set rayonsCroises true
+              ]
+            ]
+            if rayonsCroises = false
+            [
+              ask n-of n nearbyObjects
               [
                 set pcolor red
-                set bool false
               ]
             ]
           ]
         ]
     ]
-    let bool true
-      while [bool]
+    let rayonsCroises false
+    let firstTime true
+    while [ rayonsCroises = true or firstTime = true]
+      [
+        set firstTime false
+        ask one-of patches
         [
-          ask one-of patches
+          let nearbyObjects other patches in-radius (ceiling sqrt ( ( n + reste) / pi ) + 1)
+          set rayonsCroises false
+          ask nearbyObjects
           [
-            let nearbyObjects other patches in-radius (ceiling sqrt ( ( n + reste ) / pi ) + 1)
-            ask n-of ( n + reste ) nearbyObjects
+            if pcolor = red
             [
-              if pcolor != red
-              [
-                set pcolor red
-                set bool false
-              ]
+             set rayonsCroises true
+            ]
+          ]
+          if rayonsCroises = false
+          [
+            ask n-of ( n + reste) nearbyObjects
+            [
+              set pcolor red
             ]
           ]
         ]
+      ]
   ]
 
 end
@@ -314,7 +332,7 @@ numberAgents
 numberAgents
 1.0
 1000.0
-200.0
+203.0
 1.0
 1
 NIL
@@ -329,7 +347,7 @@ a
 a
 0
 1
-0.5
+0.0
 0.1
 1
 Separation Weight
@@ -344,7 +362,7 @@ b
 b
 0
 1
-0.2
+0.0
 0.1
 1
 Alignement Weight
@@ -359,7 +377,7 @@ c
 c
 0
 1
-0.4
+0.0
 0.1
 1
 Cohesion Weight
@@ -431,7 +449,7 @@ numberPackets
 numberPackets
 1
 10
-9.0
+10.0
 1
 1
 NIL
@@ -632,7 +650,7 @@ true
 Polygon -7500403 true true 150 0 0 150 105 150 105 293 195 293 195 150 300 150
 
 boat 3
-false
+true
 0
 Polygon -1 true false 63 162 90 207 223 207 290 162
 Rectangle -6459832 true false 150 32 157 162

@@ -9,6 +9,10 @@ turtles-own [
   numberOfCollectedPackets
 ]
 
+patches-own [
+  group  ;; 0 = vide/bleu ;; 1 = rouge ;; 2 = vert
+]
+
 globals
 [
   currentNumberObjects

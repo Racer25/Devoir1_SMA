@@ -76,7 +76,7 @@ to setup-objects
   ]
   [
     let n numberObjects / numberPackets
-    let  reste numberObjects mod numberPackets
+    let reste numberObjects mod numberPackets
     repeat numberPackets - 1
     [
       let rayonsCroises false
@@ -273,6 +273,34 @@ end
 to-report calculateNorme [vector]
   report sqrt ((item 0 vector ^ 2) + (item 1 vector ^ 2))
 end
+
+;;
+;; vector operations
+;;
+to-report add [ v1 v2 ]
+  report (map [ [tempA tempB] -> tempA + tempB ] v1 v2)
+end
+
+to-report subtract [ v1 v2 ]
+  report (map [ [tempA tempB] -> tempA - tempB ] v1 v2)
+end
+
+to-report scale [ scalar vector ]
+  report map [ [n] -> scalar * n ] vector
+end
+
+to-report magnitude [ vector ]
+  report sqrt sum map [ [n] -> n * n ] vector
+end
+
+to-report normalize [ vector ]
+  let m magnitude vector
+  if m = 0 [ report vector ]
+  report map [ [n] -> n / m ] vector
+end
+
+
+
 @#$#@#$#@
 GRAPHICS-WINDOW
 250

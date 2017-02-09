@@ -70,7 +70,7 @@ to setup-objects
         [
           if groupPatches = 0
           [
-            let tempGroup ((random numberGroup) + 1) ;;prend un chiffre aléatoire entre 1 et numberGroup
+            let tempGroup ((random numberGroupMax) + 1) ;;prend un chiffre aléatoire entre 1 et numberGroup
             let tempColor tempGroup * 20 + 5 ;;choisi la couleur correspondante au groupe
             set groupPatches tempGroup
             set pcolor tempColor
@@ -92,7 +92,7 @@ to setup-objects
     let reste numberObjects mod numberPackets
     repeat numberPackets - 1
     [
-      let tempGroup ((random numberGroup) + 1) ;;choix du groupe aléatoire pour ce paquet
+      let tempGroup ((random numberGroupMax) + 1) ;;choix du groupe aléatoire pour ce paquet
       let tempColor tempGroup * 20 + 5 ;;choisi la couleur correspondante au groupe
 
       let rayonsCroises false
@@ -127,7 +127,7 @@ to setup-objects
           ]
         ]
     ]
-    let tempGroup ((random numberGroup) + 1) ;;choix du groupe aléatoire du dernier paquet
+    let tempGroup ((random numberGroupMax) + 1) ;;choix du groupe aléatoire du dernier paquet
     let tempColor tempGroup * 20 + 5 ;;choisi la couleur correspondante au groupe
 
     let rayonsCroises false
@@ -443,7 +443,7 @@ numberAgents
 numberAgents
 1.0
 1000.0
-73.0
+1.0
 1.0
 1
 NIL
@@ -645,11 +645,11 @@ SLIDER
 479
 199
 512
-numberGroup
-numberGroup
+numberGroupMax
+numberGroupMax
 1
-4
-4.0
+6
+6.0
 1
 1
 NIL

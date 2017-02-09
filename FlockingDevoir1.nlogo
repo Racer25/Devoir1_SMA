@@ -1,3 +1,5 @@
+;;while (length filter [[p] ->p = red] [pcolor] of patches!=0) exemple utilisation filtre
+
 turtles-own [
   nearbyTurtles         ;; agentset of nearby turtles
   speed
@@ -89,6 +91,9 @@ to setup-objects
     let reste numberObjects mod numberPackets
     repeat numberPackets - 1
     [
+      let tempGroup ((random numberGroup) + 1) ;;choix du groupe aléatoire pour ce paquet
+      let tempColor tempGroup * 20 + 5 ;;choisi la couleur correspondante au groupe
+
       let rayonsCroises false
       let firstTime true
       while [ rayonsCroises = true or firstTime = true]
@@ -100,22 +105,30 @@ to setup-objects
             set rayonsCroises false
             ask nearbyObjects
             [
-              if pcolor = red ;;groupPatches = 1
+              if groupPatches != 0
               [
                 set rayonsCroises true
               ]
+              ;if pcolor = red ;;groupPatches = 1
+              ;[
+              ;  set rayonsCroises true
+              ;]
             ]
             if rayonsCroises = false
             [
               ask n-of n nearbyObjects
               [
-                set pcolor red
-                ;;set groupPatches 1
+                ;set pcolor red
+                set groupPatches tempGroup
+                set pcolor tempColor
               ]
             ]
           ]
         ]
     ]
+    let tempGroup ((random numberGroup) + 1) ;;choix du groupe aléatoire du dernier paquet
+    let tempColor tempGroup * 20 + 5 ;;choisi la couleur correspondante au groupe
+
     let rayonsCroises false
     let firstTime true
     while [ rayonsCroises = true or firstTime = true]
@@ -127,23 +140,27 @@ to setup-objects
           set rayonsCroises false
           ask nearbyObjects
           [
-            if pcolor = red ;;groupPatches = 1
+            if groupPatches != 0
             [
              set rayonsCroises true
             ]
+            ;if pcolor = red ;;groupPatches = 1
+            ;[
+            ; set rayonsCroises true
+            ;]
           ]
           if rayonsCroises = false
           [
             ask n-of ( n + reste) nearbyObjects
             [
-              set pcolor red
-              ;;set groupPatches 1
+              ;set pcolor red
+              set groupPatches tempGroup
+              set pcolor tempColor
             ]
           ]
         ]
       ]
   ]
-
 end
 
 to pickUp
@@ -195,11 +212,24 @@ to move  ;; turtle procedure
     set alignementForce calculateAlignementForce
     set cohesionForce calculateCohesionForce
 
+    ;set flockingForce
+    ;( map +
+    ;  (map [ [i] -> a * i ] separationForce)
+    ;  (map [ [j] -> b * j ] alignementForce)
+    ;)
+
     set flockingForce
     ( map +
+      flockingForce
       (map [ [i] -> a * i ] separationForce)
+    )
+
+    set flockingForce
+    ( map +
+      flockingForce
       (map [ [j] -> b * j ] alignementForce)
     )
+
     set flockingForce
     ( map +
       flockingForce
@@ -504,7 +534,7 @@ CHOOSER
 objectStrategy
 objectStrategy
 "byRandom" "byPackets"
-0
+1
 
 SLIDER
 26
@@ -604,7 +634,7 @@ numberGroup
 numberGroup
 1
 4
-3.0
+4.0
 1
 1
 NIL

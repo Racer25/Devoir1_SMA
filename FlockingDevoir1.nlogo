@@ -1,4 +1,7 @@
 ;;while (length filter [[p] ->p = red] [pcolor] of patches!=0) exemple utilisation filtre
+;;set flockingForce reduce + flockingForce
+;;reduce
+;;list
 
 turtles-own [
   nearbyTurtles         ;; agentset of nearby turtles
@@ -227,40 +230,45 @@ to move  ;; turtle procedure
     set alignementForce calculateAlignementForce
     set cohesionForce calculateCohesionForce
 
+    ;; V1 Charles
     ;set flockingForce
     ;( map +
     ;  (map [ [i] -> a * i ] separationForce)
     ;  (map [ [j] -> b * j ] alignementForce)
     ;)
 
-    set flockingForce
-    ( map +
-      flockingForce
-      (map [ [i] -> a * i ] separationForce)
-    )
+    ;;V1 bis Pierre
+    ;set flockingForce
+    ;( map +
+      ;flockingForce
+      ;(map [ [i] -> a * i ] separationForce)
+    ;)
 
-    set flockingForce
-    ( map +
-      flockingForce
-      (map [ [j] -> b * j ] alignementForce)
-    )
+    ;set flockingForce
+    ;( map +
+      ;flockingForce
+      ;(map [ [j] -> b * j ] alignementForce)
+    ;)
 
-    set flockingForce
-    ( map +
-      flockingForce
-      (map [ [k] -> c * k ] cohesionForce)
-    )
-    ;;         x      =          x+               ((a*sep)  +                   ( (b*alig)+                   (c*cohe)))
-   ;; set flockingForce add [flockingForce ((add [(scale[a separtionForce]) (add [(scale[b alignementForce]) (scale[c cohesionForce])])]))]
+    ;set flockingForce
+    ;( map +
+      ;flockingForce
+      ;(map [ [k] -> c * k ] cohesionForce)
+    ;)
 
-
-    set speed (map + speed flockingForce)
-    ;;set speed add [speed flockingForce]
+    ;;V2 Pierre
+    ;;         x      =          x+               ((a*sep)                 +        ( (b*alig)+                   (c*cohe)))
+    set flockingForce add (add flockingForce (scale a separationForce))  (add (scale b alignementForce) (scale c cohesionForce))
 
 
-    set speed (map [ [n] -> n / calculateNorme speed] speed)
-    ;;if magnitude speed > speedMax
-    ;;[ set speed scale [speedMax (normalize [speed])] ]
+    ;;set speed (map + speed flockingForce)
+    set speed add speed flockingForce
+
+
+    ;;set speed (map [ [n] -> n / calculateNorme speed] speed)
+    ;; limitation de la speed
+    if magnitude speed > speedMax
+    [ set speed scale speedMax (normalize speed) ]
 
 
     ;;Change orientation
@@ -443,7 +451,7 @@ numberAgents
 numberAgents
 1.0
 1000.0
-1.0
+30.0
 1.0
 1
 NIL

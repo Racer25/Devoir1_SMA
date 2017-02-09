@@ -52,8 +52,9 @@ to setup-objects
   set ticksToZeroObjects 0
   ask patches
   [
-    set pcolor blue + random 2
-    ;;set groupPatches 0
+    ;set pcolor blue + random 2
+    set pcolor black
+    set groupPatches 0
   ]
   ifelse objectStrategy = "byRandom"
   [
@@ -64,12 +65,21 @@ to setup-objects
       [
         ask one-of patches
         [
-          if pcolor != red  ;; groupPatches != 1
+          if groupPatches = 0
           [
-            set pcolor red
+            let tempGroup ((random numberGroup) + 1) ;;prend un chiffre aléatoire entre 1 et numberGroup
+            let tempColor tempGroup * 20 + 5 ;;choisi la couleur correspondante au groupe
+            set groupPatches tempGroup
+            set pcolor tempColor
+
             set bool false
-            ;;set groupPatches 1
           ]
+         ; if pcolor != red  ;; groupPatches != 1
+          ;[
+           ; set pcolor red
+           ; set bool false
+            ;;set groupPatches 1
+          ;]
         ]
       ]
     ]
@@ -195,8 +205,19 @@ to move  ;; turtle procedure
       flockingForce
       (map [ [k] -> c * k ] cohesionForce)
     )
+    ;;         x      =          x+               ((a*sep)  +                   ( (b*alig)+                   (c*cohe)))
+   ;; set flockingForce add [flockingForce ((add [(scale[a separtionForce]) (add [(scale[b alignementForce]) (scale[c cohesionForce])])]))]
+
+
     set speed (map + speed flockingForce)
+    ;;set speed add [speed flockingForce]
+
+
     set speed (map [ [n] -> n / calculateNorme speed] speed)
+    ;;if magnitude speed > speedMax
+    ;;[ set speed scale [speedMax (normalize [speed])] ]
+
+
     ;;Change orientation
     set heading  (acos (item 0 speed / calculateNorme speed))
   ]
@@ -219,9 +240,11 @@ to-report calculateSeparationForce
 
     let distanceTemp calculateNorme vectorDirector
     set vectorDirector (map [ [m] -> ( 1 / distanceTemp ) * m ]  vectorDirector)
+    ;;set vectorDirector scale [vectorDirector (1/distanceTemp)]
 
     set separationForceTemp replace-item 0 separationForceTemp ( item 0 separationForceTemp + (item 0 vectorDirector / numberOfNearbyTurtles) )
     set separationForceTemp replace-item 1 separationForceTemp ( item 1 separationForceTemp + (item 1 vectorDirector / numberOfNearbyTurtles) )
+   ;; set separationForceTemp add [separationForceTemp (division [vectorDirector numberOfNearbyTurtles])]
 
   ]
   report separationForceTemp
@@ -289,6 +312,10 @@ to-report scale [ scalar vector ]
   report map [ [n] -> scalar * n ] vector
 end
 
+to-report division [ scalar vector ]
+  report map [ [n] -> scalar / n ] vector
+end
+
 to-report magnitude [ vector ]
   report sqrt sum map [ [n] -> n * n ] vector
 end
@@ -298,7 +325,6 @@ to-report normalize [ vector ]
   if m = 0 [ report vector ]
   report map [ [n] -> n / m ] vector
 end
-
 
 
 @#$#@#$#@
@@ -372,7 +398,7 @@ numberAgents
 numberAgents
 1.0
 1000.0
-203.0
+11.0
 1.0
 1
 NIL
@@ -387,7 +413,7 @@ a
 a
 0
 1
-0.0
+0.3
 0.1
 1
 Separation Weight
@@ -402,7 +428,7 @@ b
 b
 0
 1
-0.0
+0.7
 0.1
 1
 Alignement Weight
@@ -417,7 +443,7 @@ c
 c
 0
 1
-0.0
+0.1
 0.1
 1
 Cohesion Weight
@@ -478,7 +504,7 @@ CHOOSER
 objectStrategy
 objectStrategy
 "byRandom" "byPackets"
-1
+0
 
 SLIDER
 26
@@ -568,6 +594,21 @@ currentNumberObjects
 17
 1
 11
+
+SLIDER
+27
+479
+199
+512
+numberGroup
+numberGroup
+1
+4
+3.0
+1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -690,7 +731,7 @@ true
 Polygon -7500403 true true 150 0 0 150 105 150 105 293 195 293 195 150 300 150
 
 boat 3
-true
+false
 0
 Polygon -1 true false 63 162 90 207 223 207 290 162
 Rectangle -6459832 true false 150 32 157 162

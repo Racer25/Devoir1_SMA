@@ -33,7 +33,8 @@ to setup
   create-turtles numberAgents
     [
       set shape "boat 3"
-      set color yellow - 2 + random 7  ;; random shades look nice
+      ;;set color yellow - 2 + random 7  ;; random shades look nice
+      set color grey
       set size 4  ;; easier to see
       setxy random-xcor random-ycor
       set nearbyTurtles no-turtles
@@ -43,7 +44,7 @@ to setup
       set speed replace-item 1 speed (0.2 * cos heading)
       set speedMax 2
       set numberOfCollectedPackets 0
-      ;;set groupTurtles 0
+      set groupTurtles 0
     ]
   reset-ticks
 end
@@ -164,13 +165,27 @@ to setup-objects
 end
 
 to pickUp
-  if pcolor = red ;;groupPatches = 1
+  if ((groupTurtles = 0) and (groupPatches != 0)) or ((groupPatches = groupTurtles) and (groupTurtles != 0))
+  ;;if ((color = gray ) and (pcolor != black)) or (color = pcolor)
   [
-    set pcolor blue + random 2
-    ;;set groupPatches 0
+    if(groupTurtles = 0)
+    [
+      set groupTurtles groupPatches
+      set color (groupPatches * 20 + 5)
+    ]
+    set pcolor black
+    set groupPatches 0
+
     set numberOfCollectedPackets numberOfCollectedPackets + 1
     set currentNumberObjects currentNumberObjects - 1
   ]
+
+  ;if pcolor = red ;;groupPatches = 1
+  ;[
+  ;  set pcolor blue + random 2
+  ;  set numberOfCollectedPackets numberOfCollectedPackets + 1
+  ;  set currentNumberObjects currentNumberObjects - 1
+  ;]
 end
 
 to go
@@ -428,7 +443,7 @@ numberAgents
 numberAgents
 1.0
 1000.0
-11.0
+73.0
 1.0
 1
 NIL
@@ -443,7 +458,7 @@ a
 a
 0
 1
-0.3
+0.5
 0.1
 1
 Separation Weight
@@ -458,7 +473,7 @@ b
 b
 0
 1
-0.7
+0.8
 0.1
 1
 Alignement Weight
@@ -761,7 +776,7 @@ true
 Polygon -7500403 true true 150 0 0 150 105 150 105 293 195 293 195 150 300 150
 
 boat 3
-false
+true
 0
 Polygon -1 true false 63 162 90 207 223 207 290 162
 Rectangle -6459832 true false 150 32 157 162

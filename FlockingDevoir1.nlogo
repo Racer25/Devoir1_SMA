@@ -287,18 +287,23 @@ to-report calculateSeparationForce
   let numberOfNearbyTurtles count nearbyTurtles
   ask nearbyTurtles
   [
-    let vectorDirector [ 0 0 ]
-    set vectorDirector replace-item 0 vectorDirector ( ( [ xcor ] of myself ) - xcor)
-    set vectorDirector replace-item 1 vectorDirector ( ( [ ycor ] of myself ) - ycor)
+    ;let vectorDirector [ 0 0 ]
+    ;set vectorDirector replace-item 0 vectorDirector ( ( [ xcor ] of myself ) - xcor)
+    ;set vectorDirector replace-item 1 vectorDirector ( ( [ ycor ] of myself ) - ycor)
+
+    let coorMySelf list ([ xcor ] of myself) ([ ycor ] of myself)
+    let coorNearbyTurltles list (xcor) (ycor)
+    let vectorDirector subtract coorMySelf coorNearbyTurltles
 
     let distanceTemp calculateNorme vectorDirector
-    set vectorDirector (map [ [m] -> ( 1 / distanceTemp ) * m ]  vectorDirector)
-    ;;set vectorDirector scale [vectorDirector (1/distanceTemp)]
+    ;set vectorDirector (map [ [m] -> ( 1 / distanceTemp ) * m ]  vectorDirector)
 
-    set separationForceTemp replace-item 0 separationForceTemp ( item 0 separationForceTemp + (item 0 vectorDirector / numberOfNearbyTurtles) )
-    set separationForceTemp replace-item 1 separationForceTemp ( item 1 separationForceTemp + (item 1 vectorDirector / numberOfNearbyTurtles) )
-   ;; set separationForceTemp add [separationForceTemp (division [vectorDirector numberOfNearbyTurtles])]
+    set vectorDirector divisionVS vectorDirector distanceTemp
 
+    ;set separationForceTemp replace-item 0 separationForceTemp ( item 0 separationForceTemp + (item 0 vectorDirector / numberOfNearbyTurtles) )
+    ;set separationForceTemp replace-item 1 separationForceTemp ( item 1 separationForceTemp + (item 1 vectorDirector / numberOfNearbyTurtles) )
+
+    set separationForceTemp add separationForceTemp (divisionVS vectorDirector numberOfNearbyTurtles)
   ]
   report separationForceTemp
 end
@@ -307,9 +312,12 @@ end
 ;;; Calculate alignementnForce
 to-report calculateAlignementForce
   let alignementForceTemp [0 0]
-
   set alignementForceTemp replace-item 0 alignementForceTemp ( mean  [ item 0 speed ] of nearbyTurtles )
   set alignementForceTemp replace-item 1 alignementForceTemp ( mean  [ item 1 speed ] of nearbyTurtles )
+
+  ;;;DON T WORK;;;
+  ;;;let tempSpeedNearby list ([ item 0 speed ] of nearbyTurtles) ([ item 1 speed ] of nearbyTurtles)
+  ;;;let alignementForceTemp mean tempSpeedNearby
 
   report alignementForceTemp
 end
@@ -321,23 +329,40 @@ to-report calculateCohesionForce
   set gravityCenter replace-item 0 gravityCenter ( mean  [ xcor ] of nearbyTurtles )
   set gravityCenter replace-item 1 gravityCenter ( mean  [ ycor ] of nearbyTurtles )
 
+
+  ;;;DON T WORK;;;
+  ;;;let gravityCenter list 0 0
+  ;;;let coorNearbyTurltles list ([xcor] of nearbyTurtles) ([ycor] of nearbyTurtles)
+  ;;;set gravityCenter mean coorNearbyTurltles
+
   ;;show word "xcor= " xcor
   ;;show word "ycor= " ycor
 
   ;;print gravityCenter
 
-  let vectorDirector [ 0 0 ]
-  set vectorDirector replace-item 0 vectorDirector ( item 0 gravityCenter - xcor )
-  set vectorDirector replace-item 1 vectorDirector ( item 1 gravityCenter - ycor )
+  ;let vectorDirector [ 0 0 ]
+  ;set vectorDirector replace-item 0 vectorDirector ( item 0 gravityCenter - xcor )
+  ;set vectorDirector replace-item 1 vectorDirector ( item 1 gravityCenter - ycor )
+
+  let coorMySelf list (xcor) (ycor)
+  let vectorDirector subtract gravityCenter coorMySelf
 
   ;;print word "vectorDrector= " vectorDirector
-  let sinAngle item 0 vectorDirector / calculateNorme vectorDirector
-  let cosAngle item 1 vectorDirector / calculateNorme vectorDirector
 
-  set vectorDirector replace-item 0 vectorDirector ( sinAngle )
-  set vectorDirector replace-item 1 vectorDirector ( cosAngle )
+  let angleList list 0 0
+  set angleList (divisionVS vectorDirector calculateNorme vectorDirector)
 
-  set vectorDirector map [ [l] -> speedMax * l ] vectorDirector
+  ;let sinAngle item 0 vectorDirector / calculateNorme vectorDirector
+  ;let cosAngle item 1 vectorDirector / calculateNorme vectorDirector
+
+  ;set vectorDirector replace-item 0 vectorDirector ( sinAngle )
+  ;set vectorDirector replace-item 1 vectorDirector ( cosAngle )
+  set vectorDirector angleList
+
+  ;set vectorDirector map [ [l] -> speedMax * l ] vectorDirector
+
+  if magnitude vectorDirector > speedMax
+  [ set vectorDirector scale speedMax (normalize vectorDirector) ]
 
 
   let cohesionForceTemp [ 0 0 ]
@@ -369,12 +394,20 @@ to-report scale [ scalar vector ]
   report map [ [n] -> scalar * n ] vector
 end
 
-to-report division [ scalar vector ]
+to-report divisionSV [ scalar vector ]
   report map [ [n] -> scalar / n ] vector
+end
+
+to-report divisionVS [ vector scalar ]
+  report map [ [n] ->   n / scalar ] vector
 end
 
 to-report magnitude [ vector ]
   report sqrt sum map [ [n] -> n * n ] vector
+end
+
+to-report moy [ vector ]
+  report  sum map [ [n] -> n * n ] vector
 end
 
 to-report normalize [ vector ]
@@ -382,7 +415,6 @@ to-report normalize [ vector ]
   if m = 0 [ report vector ]
   report map [ [n] -> n / m ] vector
 end
-
 @#$#@#$#@
 GRAPHICS-WINDOW
 250
@@ -469,7 +501,7 @@ a
 a
 0
 1
-0.0
+0.3
 0.1
 1
 Separation Weight
@@ -484,7 +516,7 @@ b
 b
 0
 1
-0.0
+0.5
 0.1
 1
 Alignement Weight
@@ -499,7 +531,7 @@ c
 c
 0
 1
-1.0
+0.2
 0.1
 1
 Cohesion Weight

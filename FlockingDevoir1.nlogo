@@ -74,9 +74,9 @@ to setup-objects
           if groupPatches = 0
           [
             let tempGroup ((random numberGroupMax) + 1) ;;prend un chiffre aléatoire entre 1 et numberGroup
-            let tempColor tempGroup * 20 + 5 ;;choisi la couleur correspondante au groupe
+
             set groupPatches tempGroup
-            set pcolor tempColor
+            set pcolor calcGroupColor tempGroup ;;choisi la couleur correspondante au groupe
 
             set bool false
           ]
@@ -96,7 +96,7 @@ to setup-objects
     repeat numberPackets - 1
     [
       let tempGroup ((random numberGroupMax) + 1) ;;choix du groupe aléatoire pour ce paquet
-      let tempColor tempGroup * 20 + 5 ;;choisi la couleur correspondante au groupe
+      let tempColor calcGroupColor tempGroup ;;choisi la couleur correspondante au groupe
 
       let rayonsCroises false
       let firstTime true
@@ -131,7 +131,7 @@ to setup-objects
         ]
     ]
     let tempGroup ((random numberGroupMax) + 1) ;;choix du groupe aléatoire du dernier paquet
-    let tempColor tempGroup * 20 + 5 ;;choisi la couleur correspondante au groupe
+    let tempColor calcGroupColor tempGroup ;;choisi la couleur correspondante au groupe
 
     let rayonsCroises false
     let firstTime true
@@ -174,7 +174,7 @@ to pickUp
     if(groupTurtles = 0)
     [
       set groupTurtles groupPatches
-      set color (groupPatches * 20 + 5)
+      set color calcGroupColor groupPatches
     ]
     set pcolor black
     set groupPatches 0
@@ -350,6 +350,10 @@ to-report calculateNorme [vector]
   report sqrt ((item 0 vector ^ 2) + (item 1 vector ^ 2))
 end
 
+to-report calcGroupColor [ x ]
+  report x * 20 + 5
+end
+
 ;;
 ;; vector operations
 ;;
@@ -378,7 +382,6 @@ to-report normalize [ vector ]
   if m = 0 [ report vector ]
   report map [ [n] -> n / m ] vector
 end
-
 
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -451,7 +454,7 @@ numberAgents
 numberAgents
 1.0
 1000.0
-30.0
+116.0
 1.0
 1
 NIL
@@ -466,7 +469,7 @@ a
 a
 0
 1
-0.5
+0.0
 0.1
 1
 Separation Weight
@@ -481,7 +484,7 @@ b
 b
 0
 1
-0.8
+0.0
 0.1
 1
 Alignement Weight
@@ -496,7 +499,7 @@ c
 c
 0
 1
-0.1
+1.0
 0.1
 1
 Cohesion Weight

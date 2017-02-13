@@ -80,16 +80,11 @@ to setup-objects
 
             set bool false
           ]
-         ; if pcolor != red  ;; groupPatches != 1
-          ;[
-           ; set pcolor red
-           ; set bool false
-            ;;set groupPatches 1
-          ;]
         ]
       ]
     ]
   ]
+  ;;else if byPackets
   [
     let n numberObjects / numberPackets
     let reste numberObjects mod numberPackets
@@ -113,10 +108,6 @@ to setup-objects
               [
                 set rayonsCroises true
               ]
-              ;if pcolor = red ;;groupPatches = 1
-              ;[
-              ;  set rayonsCroises true
-              ;]
             ]
             if rayonsCroises = false
             [
@@ -148,16 +139,11 @@ to setup-objects
             [
              set rayonsCroises true
             ]
-            ;if pcolor = red ;;groupPatches = 1
-            ;[
-            ; set rayonsCroises true
-            ;]
           ]
           if rayonsCroises = false
           [
             ask n-of ( n + reste) nearbyObjects
             [
-              ;set pcolor red
               set groupPatches tempGroup
               set pcolor tempColor
             ]
@@ -169,7 +155,6 @@ end
 
 to pickUp
   if ((groupTurtles = 0) and (groupPatches != 0)) or ((groupPatches = groupTurtles) and (groupTurtles != 0))
-  ;;if ((color = gray ) and (pcolor != black)) or (color = pcolor)
   [
     if(groupTurtles = 0)
     [
@@ -182,13 +167,6 @@ to pickUp
     set numberOfCollectedPackets numberOfCollectedPackets + 1
     set currentNumberObjects currentNumberObjects - 1
   ]
-
-  ;if pcolor = red ;;groupPatches = 1
-  ;[
-  ;  set pcolor blue + random 2
-  ;  set numberOfCollectedPackets numberOfCollectedPackets + 1
-  ;  set currentNumberObjects currentNumberObjects - 1
-  ;]
 end
 
 to go
@@ -201,16 +179,8 @@ to go
   ;; animate more smoothly.
   repeat 5 [ ask turtles
     [
-      fd calculateNorme speed
+      fd magnitude speed
     ] display
-  ]
-  ask one-of turtles
-  [
-    ;;print word "separationForce= "  separationForce
-    ;;print word "alignementForce= "  alignementForce
-    ;;print word "cohesionForce= "  cohesionForce
-
-    ;;print word "speed= "  speed
   ]
   ;; for greater efficiency, at the expense of smooth
   ;; animation, substitute the following line instead:
@@ -230,49 +200,18 @@ to move  ;; turtle procedure
     set alignementForce calculateAlignementForce
     set cohesionForce calculateCohesionForce
 
-    ;; V1 Charles
-    ;set flockingForce
-    ;( map +
-    ;  (map [ [i] -> a * i ] separationForce)
-    ;  (map [ [j] -> b * j ] alignementForce)
-    ;)
-
-    ;;V1 bis Pierre
-    ;set flockingForce
-    ;( map +
-      ;flockingForce
-      ;(map [ [i] -> a * i ] separationForce)
-    ;)
-
-    ;set flockingForce
-    ;( map +
-      ;flockingForce
-      ;(map [ [j] -> b * j ] alignementForce)
-    ;)
-
-    ;set flockingForce
-    ;( map +
-      ;flockingForce
-      ;(map [ [k] -> c * k ] cohesionForce)
-    ;)
-
-    ;;V2 Pierre
+    ;;V3 Charles légèrement modifié pour correspondre à l'énoncé, flockingForce= somme des 3 forces et non flockingForce= somme des 3 forces +flocking force
     ;;         x      =          x+               ((a*sep)                 +        ( (b*alig)+                   (c*cohe)))
-    set flockingForce add (add flockingForce (scale a separationForce))  (add (scale b alignementForce) (scale c cohesionForce))
+    set flockingForce (add scale a separationForce  (add (scale b alignementForce) (scale c cohesionForce)))
 
-
-    ;;set speed (map + speed flockingForce)
     set speed add speed flockingForce
 
-
-    ;;set speed (map [ [n] -> n / calculateNorme speed] speed)
     ;; limitation de la speed
     if magnitude speed > speedMax
     [ set speed scale speedMax (normalize speed) ]
 
-
     ;;Change orientation
-    set heading  (acos (item 0 speed / calculateNorme speed))
+    set heading  (acos (item 0 speed / magnitude speed))
   ]
 
 end
@@ -287,21 +226,14 @@ to-report calculateSeparationForce
   let numberOfNearbyTurtles count nearbyTurtles
   ask nearbyTurtles
   [
-    ;let vectorDirector [ 0 0 ]
-    ;set vectorDirector replace-item 0 vectorDirector ( ( [ xcor ] of myself ) - xcor)
-    ;set vectorDirector replace-item 1 vectorDirector ( ( [ ycor ] of myself ) - ycor)
-
     let coorMySelf list ([ xcor ] of myself) ([ ycor ] of myself)
     let coorNearbyTurltles list (xcor) (ycor)
     let vectorDirector subtract coorMySelf coorNearbyTurltles
 
-    let distanceTemp calculateNorme vectorDirector
-    ;set vectorDirector (map [ [m] -> ( 1 / distanceTemp ) * m ]  vectorDirector)
+    let distanceTemp magnitude vectorDirector
 
+    ;;inversement proportionnel à la distance
     set vectorDirector divisionVS vectorDirector distanceTemp
-
-    ;set separationForceTemp replace-item 0 separationForceTemp ( item 0 separationForceTemp + (item 0 vectorDirector / numberOfNearbyTurtles) )
-    ;set separationForceTemp replace-item 1 separationForceTemp ( item 1 separationForceTemp + (item 1 vectorDirector / numberOfNearbyTurtles) )
 
     set separationForceTemp add separationForceTemp (divisionVS vectorDirector numberOfNearbyTurtles)
   ]
@@ -311,68 +243,21 @@ end
 
 ;;; Calculate alignementnForce
 to-report calculateAlignementForce
-  let alignementForceTemp [0 0]
-  set alignementForceTemp replace-item 0 alignementForceTemp ( mean  [ item 0 speed ] of nearbyTurtles )
-  set alignementForceTemp replace-item 1 alignementForceTemp ( mean  [ item 1 speed ] of nearbyTurtles )
-
-  ;;;DON T WORK;;;
-  ;;;let tempSpeedNearby list ([ item 0 speed ] of nearbyTurtles) ([ item 1 speed ] of nearbyTurtles)
-  ;;;let alignementForceTemp mean tempSpeedNearby
-
-  report alignementForceTemp
+  report list (mean [ item 0 speed ] of nearbyTurtles) (mean [ item 1 speed ] of nearbyTurtles)
 end
 
 
 ;;; Calculate cohesionForce
 to-report calculateCohesionForce
-  let gravityCenter [ 0 0 ]
-  set gravityCenter replace-item 0 gravityCenter ( mean  [ xcor ] of nearbyTurtles )
-  set gravityCenter replace-item 1 gravityCenter ( mean  [ ycor ] of nearbyTurtles )
-
-
-  ;;;DON T WORK;;;
-  ;;;let gravityCenter list 0 0
-  ;;;let coorNearbyTurltles list ([xcor] of nearbyTurtles) ([ycor] of nearbyTurtles)
-  ;;;set gravityCenter mean coorNearbyTurltles
-
-  ;;show word "xcor= " xcor
-  ;;show word "ycor= " ycor
-
-  ;;print gravityCenter
-
-  ;let vectorDirector [ 0 0 ]
-  ;set vectorDirector replace-item 0 vectorDirector ( item 0 gravityCenter - xcor )
-  ;set vectorDirector replace-item 1 vectorDirector ( item 1 gravityCenter - ycor )
-
+  let gravityCenter list (mean [xcor] of nearbyTurtles) (mean [ycor] of nearbyTurtles)
   let coorMySelf list (xcor) (ycor)
+
   let vectorDirector subtract gravityCenter coorMySelf
-
-  ;;print word "vectorDrector= " vectorDirector
-
-  let angleList list 0 0
-  set angleList (divisionVS vectorDirector calculateNorme vectorDirector)
-
-  ;let sinAngle item 0 vectorDirector / calculateNorme vectorDirector
-  ;let cosAngle item 1 vectorDirector / calculateNorme vectorDirector
-
-  ;set vectorDirector replace-item 0 vectorDirector ( sinAngle )
-  ;set vectorDirector replace-item 1 vectorDirector ( cosAngle )
-  set vectorDirector angleList
-
-  ;set vectorDirector map [ [l] -> speedMax * l ] vectorDirector
 
   if magnitude vectorDirector > speedMax
   [ set vectorDirector scale speedMax (normalize vectorDirector) ]
 
-
-  let cohesionForceTemp [ 0 0 ]
-  set cohesionForceTemp ( map - vectorDirector speed)
-
-  report cohesionForceTemp
-end
-
-to-report calculateNorme [vector]
-  report sqrt ((item 0 vector ^ 2) + (item 1 vector ^ 2))
+  report subtract vectorDirector speed
 end
 
 to-report calcGroupColor [ x ]
@@ -407,7 +292,7 @@ to-report magnitude [ vector ]
 end
 
 to-report moy [ vector ]
-  report  sum map [ [n] -> n * n ] vector
+  report  sum map [ [n] -> n / length vector ] vector
 end
 
 to-report normalize [ vector ]
@@ -501,7 +386,7 @@ a
 a
 0
 1
-0.3
+0.6
 0.1
 1
 Separation Weight
@@ -516,7 +401,7 @@ b
 b
 0
 1
-0.5
+0.7
 0.1
 1
 Alignement Weight
@@ -531,7 +416,7 @@ c
 c
 0
 1
-0.2
+0.3
 0.1
 1
 Cohesion Weight

@@ -9,6 +9,7 @@ turtles-own [
   separationForce
   alignementForce
   cohesionForce
+  groupingForce
   flockingForce
   speedMax
   numberOfCollectedPackets
@@ -199,10 +200,11 @@ to move  ;; turtle procedure
     set separationForce calculateSeparationForce
     set alignementForce calculateAlignementForce
     set cohesionForce calculateCohesionForce
+    set groupingForce calculateGroupingForce
 
     ;;V3 Charles légèrement modifié pour correspondre à l'énoncé, flockingForce= somme des 3 forces et non flockingForce= somme des 3 forces +flocking force
     ;;         x      =          x+               ((a*sep)                 +        ( (b*alig)+                   (c*cohe)))
-    set flockingForce (add scale a separationForce  (add (scale b alignementForce) (scale c cohesionForce)))
+    set flockingForce add (add scale a separationForce  (add (scale b alignementForce) (scale c cohesionForce))) scale d groupingForce
 
     set speed add speed flockingForce
 
@@ -258,6 +260,11 @@ to-report calculateCohesionForce
   [ set vectorDirector scale speedMax (normalize vectorDirector) ]
 
   report subtract vectorDirector speed
+end
+
+;;TODO
+to-report calculateGroupingForce
+  report [ 0 0 ]
 end
 
 to-report calcGroupColor [ x ]
@@ -581,6 +588,21 @@ numberGroupMax
 1
 1
 NIL
+HORIZONTAL
+
+SLIDER
+9
+282
+181
+315
+d
+d
+0
+1
+0.5
+0.1
+1
+Grouping Weight
 HORIZONTAL
 
 @#$#@#$#@

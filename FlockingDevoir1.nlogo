@@ -264,7 +264,58 @@ end
 
 ;;TODO
 to-report calculateGroupingForce
-  report [ 0 0 ]
+  let groupingForceTemp [0 0]
+
+  let nearbyDifferentTurtles nearbyTurtles with [ (groupTurtles != [groupTurtles] of myself) and groupTurtles != 0 and [groupTurtles] of myself != 0]
+  let numberNearbyDifferentTurtles count nearbyDifferentTurtles
+
+  let nearbySameTurtles nearbyTurtles with [ (groupTurtles = [groupTurtles] of myself) and groupTurtles != 0 and [groupTurtles] of myself != 0]
+  let numberSameTurtles count nearbySameTurtles
+
+  ifelse numberSameTurtles > numberNearbyDifferentTurtles
+  [
+    ;;Proximity with same group
+    if any? nearbySameTurtles
+    [
+      ;;set groupingForceTemp add groupingForceTemp list (mean [ item 0 speed ] of nearbySameTurtles) (mean [ item 1 speed ] of nearbySameTurtles)
+      ask nearbySameTurtles
+      [
+        let coorMySelf list ([ xcor ] of myself) ([ ycor ] of myself)
+        let coorNearbyTurltles list (xcor) (ycor)
+        let vectorDirector subtract coorMySelf coorNearbyTurltles
+
+        let distanceTemp magnitude vectorDirector
+
+        ;;proportionnel à la distance
+        set vectorDirector scale distanceTemp vectorDirector
+
+        set groupingForceTemp add groupingForceTemp (divisionVS vectorDirector numberSameTurtles)
+      ]
+    ]
+  ]
+  [
+    ;;Separation from other groups
+    if numberSameTurtles != numberNearbyDifferentTurtles
+    [
+      if any? nearbyDifferentTurtles
+      [
+        ask nearbyDifferentTurtles
+        [
+          let coorMySelf list ([ xcor ] of myself) ([ ycor ] of myself)
+          let coorNearbyTurltles list (xcor) (ycor)
+          let vectorDirector subtract coorMySelf coorNearbyTurltles
+
+          let distanceTemp magnitude vectorDirector
+
+          ;;inversement proportionnel à la distance
+          set vectorDirector divisionVS vectorDirector distanceTemp
+
+          set groupingForceTemp add groupingForceTemp (divisionVS vectorDirector numberNearbyDifferentTurtles)
+        ]
+      ]
+    ]
+  ]
+  report groupingForceTemp
 end
 
 to-report calcGroupColor [ x ]
@@ -378,7 +429,7 @@ numberAgents
 numberAgents
 1.0
 1000.0
-116.0
+97.0
 1.0
 1
 NIL
@@ -393,7 +444,7 @@ a
 a
 0
 1
-0.6
+0.0
 0.1
 1
 Separation Weight
@@ -408,7 +459,7 @@ b
 b
 0
 1
-0.7
+0.0
 0.1
 1
 Alignement Weight
@@ -423,7 +474,7 @@ c
 c
 0
 1
-0.3
+0.0
 0.1
 1
 Cohesion Weight
@@ -438,7 +489,7 @@ vision
 vision
 0
 10
-5.0
+10.0
 1
 1
 NIL
@@ -599,7 +650,7 @@ d
 d
 0
 1
-0.5
+1.0
 0.1
 1
 Grouping Weight

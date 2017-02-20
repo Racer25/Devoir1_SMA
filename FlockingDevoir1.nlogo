@@ -25,6 +25,7 @@ globals
   ;;Performances Measures
   currentNumberObjects
   ticksToZeroObjects
+  averageAngularVariation
 ]
 
 ;;Method to use before start
@@ -182,6 +183,7 @@ to go
     pickUp
     move
   ]
+  calcAverageAngularVariation
   ;; the following line is used to make the turtles
   ;; animate more smoothly.
   repeat 5 [ ask turtles
@@ -373,6 +375,20 @@ to-report translationCoord [coorToChange coorMySelf]
    ]
    report newCoord
 
+end
+
+to calcAverageAngularVariation
+  set averageAngularVariation 0
+  ask turtles
+  [
+    if any? nearbyTurtles
+    [
+      let headingTurt heading
+      let angularVariation mean ( [abs (headingTurt - heading )] of nearbyTurtles)
+      set averageAngularVariation averageAngularVariation + (angularVariation / count turtles)
+    ]
+  ]
+  show averageAngularVariation
 end
 
 to-report calcGroupColor [ x ]

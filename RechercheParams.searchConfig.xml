@@ -14,19 +14,20 @@
 <fitnessInfo>
 <fitnessMinimized>true</fitnessMinimized>
 <fitnessCollecting>MEAN_ACROSS_STEPS</fitnessCollecting>
-<fitnessSamplingReplications>20</fitnessSamplingReplications>
+<fitnessSamplingReplications>10</fitnessSamplingReplications>
 <fitnessCombineReplications>MEAN</fitnessCombineReplications>
 </fitnessInfo>
 <searchSpace>
-<paramSpec>["numberagents" 200]</paramSpec>
-<paramSpec>["a" [0 0.1 1]]</paramSpec>
-<paramSpec>["b" [0 0.1 1]]</paramSpec>
-<paramSpec>["c" [0 0.1 1]]</paramSpec>
-<paramSpec>["vision" 5]</paramSpec>
+<paramSpec>["numberagents" 100]</paramSpec>
+<paramSpec>["a" [0 0.2 10]]</paramSpec>
+<paramSpec>["b" [0 0.2 10]]</paramSpec>
+<paramSpec>["c" [0 0.2 10]]</paramSpec>
+<paramSpec>["vision" 10]</paramSpec>
 <paramSpec>["numberobjects" 100]</paramSpec>
-<paramSpec>["objectstrategy" "byPackets"]</paramSpec>
-<paramSpec>["numberpackets" 5]</paramSpec>
-<paramSpec>["packetradius" 3]</paramSpec>
+<paramSpec>["objectstrategy" "byRandom"]</paramSpec>
+<paramSpec>["numberpackets" 4]</paramSpec>
+<paramSpec>["numbergroupmax" 1]</paramSpec>
+<paramSpec>["d" 0]</paramSpec>
 </searchSpace>
 <searchMethod type="StandardGA">
 <searchMethodParameter name="mutation-rate" value="0.03"/>

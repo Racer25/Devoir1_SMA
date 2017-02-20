@@ -39,9 +39,8 @@ to setup
   create-turtles numberAgents
     [
       set shape "bee 2"
-      ;;set color yellow - 2 + random 7  ;; random shades look nice
       set color grey
-      set size 4  ;; easier to see
+      set size 4
       setxy random-xcor random-ycor
       set nearbyTurtles no-turtles
       set flockingForce [0 0]
@@ -62,7 +61,7 @@ to setup-objects
   ;;Initialisation of group and color
   ask patches
   [
-    set pcolor black
+    set pcolor 109
     set groupPatches 0
   ]
   ifelse objectStrategy = "byRandom"
@@ -168,7 +167,7 @@ to pickUp
       set groupTurtles groupPatches
       set color calcGroupColor groupPatches
     ]
-    set pcolor black
+    set pcolor 109
     set groupPatches 0
 
     set numberOfCollectedObjects numberOfCollectedObjects + 1
@@ -487,7 +486,7 @@ numberAgents
 numberAgents
 1.0
 1000.0
-313.0
+100.0
 1.0
 1
 NIL
@@ -517,7 +516,7 @@ b
 b
 0
 10
-0.0
+8.4
 0.2
 1
 Alignement Weight
@@ -532,7 +531,7 @@ c
 c
 0
 10
-10.0
+4.2
 0.2
 1
 Cohesion Weight
@@ -562,7 +561,7 @@ numberObjects
 numberObjects
 10
 1000
-1000.0
+100.0
 1
 1
 NIL
@@ -604,7 +603,7 @@ numberPackets
 numberPackets
 1
 10
-4.0
+5.0
 1
 1
 NIL
@@ -693,7 +692,7 @@ numberGroupMax
 numberGroupMax
 1
 6
-5.0
+1.0
 1
 1
 NIL

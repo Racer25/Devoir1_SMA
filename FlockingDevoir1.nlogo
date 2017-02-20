@@ -461,10 +461,10 @@ ticks
 30.0
 
 BUTTON
-39
-93
-116
-126
+10
+13
+115
+46
 NIL
 setup
 NIL
@@ -479,9 +479,9 @@ NIL
 
 BUTTON
 122
-93
+13
 203
-126
+46
 NIL
 go
 T
@@ -496,9 +496,9 @@ NIL
 
 SLIDER
 9
-51
+103
 232
-84
+136
 numberAgents
 numberAgents
 1.0
@@ -518,7 +518,7 @@ a
 a
 0
 10
-10.0
+1.6
 0.2
 1
 Separation Weight
@@ -533,7 +533,7 @@ b
 b
 0
 10
-8.4
+7.6
 0.2
 1
 Alignement Weight
@@ -555,10 +555,10 @@ Cohesion Weight
 HORIZONTAL
 
 SLIDER
-825
-55
-997
-88
+9
+140
+181
+173
 vision
 vision
 0
@@ -570,10 +570,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-25
-330
-197
-363
+9
+324
+181
+357
 numberObjects
 numberObjects
 10
@@ -586,9 +586,9 @@ HORIZONTAL
 
 BUTTON
 8
-130
+53
 116
-163
+86
 setup-objects
 setup-objects
 NIL
@@ -602,35 +602,35 @@ NIL
 1
 
 CHOOSER
-26
-372
-164
-417
+10
+366
+148
+411
 objectStrategy
 objectStrategy
 "byRandom" "byPackets"
-1
+0
 
 SLIDER
-26
-430
-198
-463
+10
+424
+182
+457
 numberPackets
 numberPackets
 1
 10
-5.0
+6.0
 1
 1
 NIL
 HORIZONTAL
 
 PLOT
-792
-130
-1225
-342
+704
+31
+1137
+243
 Remaining objects
 Ticks
 Number of objects
@@ -645,10 +645,10 @@ PENS
 "default" 1.0 0 -16777216 true "" "plot currentNumberObjects"
 
 BUTTON
-947
-350
-1032
-383
+857
+252
+942
+285
 Clear Plot
 clear-all-plots
 NIL
@@ -663,9 +663,9 @@ NIL
 
 BUTTON
 122
-130
+53
 202
-163
+86
 bigSetup
 bigSetup
 NIL
@@ -679,10 +679,10 @@ NIL
 1
 
 MONITOR
-850
-392
-907
-437
+760
+294
+817
+339
 Ticks
 ticksToZeroObjects
 17
@@ -690,10 +690,10 @@ ticksToZeroObjects
 11
 
 MONITOR
-1005
-392
-1144
-437
+963
+296
+1102
+341
 currentNumberObjects
 currentNumberObjects
 17
@@ -701,15 +701,19 @@ currentNumberObjects
 11
 
 SLIDER
-27
-479
-199
-512
+10
+465
+182
+498
 numberGroupMax
 numberGroupMax
 1
 6
+<<<<<<< HEAD
 3.0
+=======
+5.0
+>>>>>>> 11b679c88dee3e8005c7a94c1238a66c7c5d15c6
 1
 1
 NIL
@@ -724,7 +728,7 @@ d
 d
 0
 10
-0.0
+6.0
 0.2
 1
 Grouping Weight

@@ -1,31 +1,33 @@
-;;while (length filter [[p] ->p = red] [pcolor] of patches!=0) exemple utilisation filtre
-;;set flockingForce reduce + flockingForce
-;;reduce
-;;list
-
 turtles-own [
-  nearbyTurtles         ;; agentset of nearby turtles
+  nearbyTurtles;; agentset of nearby turtles
   speed
+  ;;Forces with [Fx Fy]
   separationForce
   alignementForce
   cohesionForce
   groupingForce
+
+  ;;Sum of forces
   flockingForce
-  speedMax
-  numberOfCollectedPackets
-  groupTurtles
+
+  ;;Other attributes
+  speedMax;; max speed of turtles
+  numberOfCollectedObjects;; number of collocted packets
+  groupTurtles;; Integer determining the group of the turtle
 ]
 
 patches-own [
-  groupPatches
+  groupPatches;;Integer determining the group of the patches;; 0= NoGroup
 ]
 
 globals
 [
+  ;;Performances Measures
   currentNumberObjects
   ticksToZeroObjects
 ]
 
+;;Method to use before start
 to bigSetup
   setup
   setup-objects
@@ -36,7 +38,7 @@ to setup
   clear-turtles
   create-turtles numberAgents
     [
-      set shape "boat 3"
+      set shape "bee 2"
       ;;set color yellow - 2 + random 7  ;; random shades look nice
       set color grey
       set size 4  ;; easier to see
@@ -47,7 +49,7 @@ to setup
       set speed replace-item 0 speed (0.2 * sin heading)
       set speed replace-item 1 speed (0.2 * cos heading)
       set speedMax 2
-      set numberOfCollectedPackets 0
+      set numberOfCollectedObjects 0
       set groupTurtles 0
     ]
   reset-ticks
@@ -57,9 +59,9 @@ to setup-objects
   clear-patches
   set currentNumberObjects numberObjects
   set ticksToZeroObjects 0
+  ;;Initialisation of group and color
   ask patches
   [
-    ;set pcolor blue + random 2
     set pcolor black
     set groupPatches 0
   ]
@@ -67,6 +69,7 @@ to setup-objects
   [
     repeat numberObjects
     [
+      ;;Coloration and group attribition by Random
       let bool true
       while [bool]
       [
@@ -87,6 +90,8 @@ to setup-objects
   ]
   ;;else if byPackets
   [
+    ;;Coloration and group attribition by Packets
+
     let n numberObjects / numberPackets
     let reste numberObjects mod numberPackets
     repeat numberPackets - 1
@@ -154,6 +159,7 @@ to setup-objects
   ]
 end
 
+;;Method to pick up objects
 to pickUp
   if ((groupTurtles = 0) and (groupPatches != 0)) or ((groupPatches = groupTurtles) and (groupTurtles != 0))
   [
@@ -165,11 +171,12 @@ to pickUp
     set pcolor black
     set groupPatches 0
 
-    set numberOfCollectedPackets numberOfCollectedPackets + 1
+    set numberOfCollectedObjects numberOfCollectedObjects + 1
     set currentNumberObjects currentNumberObjects - 1
   ]
 end
 
+;;Start simulation
 to go
   ask turtles
   [
@@ -183,14 +190,9 @@ to go
       fd magnitude speed
     ] display
   ]
-  ;; for greater efficiency, at the expense of smooth
-  ;; animation, substitute the following line instead:
-  ;;   ask turtles [ fd 1 ]
   tick
   set ticksToZeroObjects ticksToZeroObjects + 1
-  if currentNumberObjects = 0 [
-    stop
-  ]
+  if currentNumberObjects = 0 [stop];; Stop if no objects
 end
 
 to move  ;; turtle procedure
@@ -202,10 +204,10 @@ to move  ;; turtle procedure
     set cohesionForce calculateCohesionForce
     set groupingForce calculateGroupingForce
 
-    ;;V3 Charles légèrement modifié pour correspondre à l'énoncé, flockingForce= somme des 3 forces et non flockingForce= somme des 3 forces +flocking force
-    ;;         x      =          x+               ((a*sep)                 +        ( (b*alig)+                   (c*cohe)))
+    ;;Sum of all forces
     set flockingForce add (add scale a separationForce  (add (scale b alignementForce) (scale c cohesionForce))) scale d groupingForce
 
+    ;;Setting speed
     set speed add speed flockingForce
 
     ;; limitation de la speed
@@ -226,16 +228,15 @@ end
 to-report calculateSeparationForce
   let separationForceTemp [0 0]
   let numberOfNearbyTurtles count nearbyTurtles
+  let coorMySelf list (xcor) (ycor)
   ask nearbyTurtles
   [
-    let coorMySelf list ([ xcor ] of myself) ([ ycor ] of myself)
     let coorNearbyTurltles list (xcor) (ycor)
+    ;;Correction of nearby turtles coordinates;;
+    let coorNearbyTurltlesCorrection translationCoord coorNearbyTurltles coorMySelf
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-    ;;let vectorDirector subtract coorMySelf coorNearbyTurltles
-    let coorNearbyTurltlesPrim translationCoord coorNearbyTurltles coorMySelf
-    let vectorDirector subtract coorMySelf coorNearbyTurltlesPrim
-
-    ;;show translationCoord coorNearbyTurltles coorMySelf
+    let vectorDirector subtract coorMySelf coorNearbyTurltlesCorrection
 
     let distanceTemp magnitude vectorDirector
 
@@ -256,18 +257,20 @@ end
 
 ;;; Calculate cohesionForce
 to-report calculateCohesionForce
-  let gravityCenter list (mean [xcor] of nearbyTurtles) (mean [ycor] of nearbyTurtles)
-
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;TO CHECK AND MODIFY
 
   let coorMySelf list (xcor) (ycor)
-  ;;let coorNearbyTurltles list ([xcor] of nearbyTurtles) ([ycor] of nearbyTurtles)
-  ;let coorNearbyTurltlesPrim translationCoord coorNearbyTurltles coorMySelf
-  ;;let gravityCenter list (mean [0] of coorNearbyTurltlesPrim) (mean [1] of coorNearbyTurltlesPrim)
-  ;;let gravityCenter list (mean (item 0 coorNearbyTurltlesPrim)) (mean (item 1 coorNearbyTurltlesPrim))
-  ;; MARCHE PAS, fais liste de liste
+  ;;Correction of nearby turtles coordinates;;;;;
+  let listCoorNearbyTurltlesPrim []
+  ask nearbyTurtles
+  [
+    set listCoorNearbyTurltlesPrim lput (translationCoord (list xcor ycor) coorMySelf) listCoorNearbyTurltlesPrim
+  ]
+  let listCoorXNearbyTurltlesPrim map [ [i] -> item 0 i ] listCoorNearbyTurltlesPrim
+  let listCoorYNearbyTurltlesPrim map [ [i] -> item 1 i ] listCoorNearbyTurltlesPrim
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-  ;;show translationCoord coorNearbyTurltles coorMySelf
+  ;;Utilisation des coordonnées corrigées
+  let gravityCenter list (mean listCoorXNearbyTurltlesPrim) (mean listCoorYNearbyTurltlesPrim)
 
   let vectorDirector subtract gravityCenter coorMySelf
 
@@ -277,15 +280,13 @@ to-report calculateCohesionForce
   report subtract vectorDirector speed
 end
 
-;;TODO
 to-report calculateGroupingForce
   let groupingForceTemp [0 0]
 
-  ;;let nearbyDifferentTurtles nearbyTurtles with [ (groupTurtles != [groupTurtles] of myself) and groupTurtles != 0 and [groupTurtles] of myself != 0]
+  ;;Détection des agents de groupes différents (n'ayant pas de couleur moi même)
   let nearbyDifferentTurtles nearbyTurtles with [ (groupTurtles != [groupTurtles] of myself) and [groupTurtles] of myself != 0]
   let numberNearbyDifferentTurtles count nearbyDifferentTurtles
 
-  ;;let nearbySameTurtles nearbyTurtles with [ (groupTurtles = [groupTurtles] of myself) and groupTurtles != 0 and [groupTurtles] of myself != 0]
   let nearbySameTurtles nearbyTurtles with [ (groupTurtles = [groupTurtles] of myself) and [groupTurtles] of myself != 0]
   let numberSameTurtles count nearbySameTurtles
 
@@ -294,15 +295,15 @@ to-report calculateGroupingForce
     ;;Proximity with same group
     if any? nearbySameTurtles
     [
-      ;;set groupingForceTemp add groupingForceTemp list (mean [ item 0 speed ] of nearbySameTurtles) (mean [ item 1 speed ] of nearbySameTurtles)
       ask nearbySameTurtles
       [
         let coorMySelf list ([ xcor ] of myself) ([ ycor ] of myself)
         let coorNearbyTurltles list (xcor) (ycor)
 
-        ;let vectorDirector subtract coorMySelf coorNearbyTurltles
-        let coorNearbyTurltlesPrim translationCoord coorNearbyTurltles coorMySelf
-        let vectorDirector subtract coorMySelf coorNearbyTurltlesPrim
+        ;;;;Correction of nearby turtles coordinates;;
+        let coorNearbyTurltlesCorrection translationCoord coorNearbyTurltles coorMySelf
+        ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+        let vectorDirector subtract coorMySelf coorNearbyTurltlesCorrection
 
         let distanceTemp magnitude vectorDirector
 
@@ -324,8 +325,9 @@ to-report calculateGroupingForce
           let coorMySelf list ([ xcor ] of myself) ([ ycor ] of myself)
           let coorNearbyTurltles list (xcor) (ycor)
 
-          ;let vectorDirector subtract coorMySelf coorNearbyTurltles
+          ;;;;Correction of nearby turtles coordinates;;
           let coorNearbyTurltlesPrim translationCoord coorNearbyTurltles coorMySelf
+          ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
           let vectorDirector subtract coorMySelf coorNearbyTurltlesPrim
 
           let distanceTemp magnitude vectorDirector
@@ -341,6 +343,7 @@ to-report calculateGroupingForce
   report groupingForceTemp
 end
 
+;;Correction Method (because of edges of the map)
 to-report translationCoord [coorToChange coorMySelf]
 
    let distanceTurtles subtract coorMySelf coorToChange
@@ -484,7 +487,7 @@ numberAgents
 numberAgents
 1.0
 1000.0
-100.0
+313.0
 1.0
 1
 NIL
@@ -499,7 +502,7 @@ a
 a
 0
 10
-2.0
+0.0
 0.2
 1
 Separation Weight
@@ -529,7 +532,7 @@ c
 c
 0
 10
-1.2
+10.0
 0.2
 1
 Cohesion Weight
@@ -601,7 +604,7 @@ numberPackets
 numberPackets
 1
 10
-10.0
+4.0
 1
 1
 NIL
@@ -690,7 +693,7 @@ numberGroupMax
 numberGroupMax
 1
 6
-1.0
+5.0
 1
 1
 NIL
@@ -705,7 +708,7 @@ d
 d
 0
 10
-5.2
+0.0
 0.2
 1
 Grouping Weight
@@ -830,6 +833,27 @@ arrow
 true
 0
 Polygon -7500403 true true 150 0 0 150 105 150 105 293 195 293 195 150 300 150
+
+bee 2
+true
+0
+Polygon -1184463 true false 195 150 105 150 90 165 90 225 105 270 135 300 165 300 195 270 210 225 210 165 195 150
+Rectangle -16777216 true false 90 165 212 185
+Polygon -16777216 true false 90 207 90 226 210 226 210 207
+Polygon -16777216 true false 103 266 198 266 203 246 96 246
+Polygon -6459832 true false 120 150 105 135 105 75 120 60 180 60 195 75 195 135 180 150
+Polygon -6459832 true false 150 15 120 30 120 60 180 60 180 30
+Circle -16777216 true false 105 30 30
+Circle -16777216 true false 165 30 30
+Polygon -7500403 true true 120 90 75 105 15 90 30 75 120 75
+Polygon -16777216 false false 120 75 30 75 15 90 75 105 120 90
+Polygon -7500403 true true 180 75 180 90 225 105 285 90 270 75
+Polygon -16777216 false false 180 75 270 75 285 90 225 105 180 90
+Polygon -7500403 true true 180 75 180 90 195 105 240 195 270 210 285 210 285 150 255 105
+Polygon -16777216 false false 180 75 255 105 285 150 285 210 270 210 240 195 195 105 180 90
+Polygon -7500403 true true 120 75 45 105 15 150 15 210 30 210 60 195 105 105 120 90
+Polygon -16777216 false false 120 75 45 105 15 150 15 210 30 210 60 195 105 105 120 90
+Polygon -16777216 true false 135 300 165 300 180 285 120 285
 
 boat 3
 true

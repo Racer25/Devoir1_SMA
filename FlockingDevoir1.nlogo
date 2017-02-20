@@ -17,7 +17,7 @@ turtles-own [
 ]
 
 patches-own [
-  groupPatches  ;; 0 = vide/bleu ;; 1 = rouge ;; 2 = vert
+  groupPatches
 ]
 
 globals
@@ -230,7 +230,12 @@ to-report calculateSeparationForce
   [
     let coorMySelf list ([ xcor ] of myself) ([ ycor ] of myself)
     let coorNearbyTurltles list (xcor) (ycor)
-    let vectorDirector subtract coorMySelf coorNearbyTurltles
+
+    ;;let vectorDirector subtract coorMySelf coorNearbyTurltles
+    let coorNearbyTurltlesPrim translationCoord coorNearbyTurltles coorMySelf
+    let vectorDirector subtract coorMySelf coorNearbyTurltlesPrim
+
+    ;;show translationCoord coorNearbyTurltles coorMySelf
 
     let distanceTemp magnitude vectorDirector
 
@@ -252,7 +257,17 @@ end
 ;;; Calculate cohesionForce
 to-report calculateCohesionForce
   let gravityCenter list (mean [xcor] of nearbyTurtles) (mean [ycor] of nearbyTurtles)
+
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;TO CHECK AND MODIFY
+
   let coorMySelf list (xcor) (ycor)
+  ;;let coorNearbyTurltles list ([xcor] of nearbyTurtles) ([ycor] of nearbyTurtles)
+  ;let coorNearbyTurltlesPrim translationCoord coorNearbyTurltles coorMySelf
+  ;;let gravityCenter list (mean [0] of coorNearbyTurltlesPrim) (mean [1] of coorNearbyTurltlesPrim)
+  ;;let gravityCenter list (mean (item 0 coorNearbyTurltlesPrim)) (mean (item 1 coorNearbyTurltlesPrim))
+  ;; MARCHE PAS, fais liste de liste
+
+  ;;show translationCoord coorNearbyTurltles coorMySelf
 
   let vectorDirector subtract gravityCenter coorMySelf
 
@@ -266,10 +281,12 @@ end
 to-report calculateGroupingForce
   let groupingForceTemp [0 0]
 
-  let nearbyDifferentTurtles nearbyTurtles with [ (groupTurtles != [groupTurtles] of myself) and groupTurtles != 0 and [groupTurtles] of myself != 0]
+  ;;let nearbyDifferentTurtles nearbyTurtles with [ (groupTurtles != [groupTurtles] of myself) and groupTurtles != 0 and [groupTurtles] of myself != 0]
+  let nearbyDifferentTurtles nearbyTurtles with [ (groupTurtles != [groupTurtles] of myself) and [groupTurtles] of myself != 0]
   let numberNearbyDifferentTurtles count nearbyDifferentTurtles
 
-  let nearbySameTurtles nearbyTurtles with [ (groupTurtles = [groupTurtles] of myself) and groupTurtles != 0 and [groupTurtles] of myself != 0]
+  ;;let nearbySameTurtles nearbyTurtles with [ (groupTurtles = [groupTurtles] of myself) and groupTurtles != 0 and [groupTurtles] of myself != 0]
+  let nearbySameTurtles nearbyTurtles with [ (groupTurtles = [groupTurtles] of myself) and [groupTurtles] of myself != 0]
   let numberSameTurtles count nearbySameTurtles
 
   ifelse numberSameTurtles > numberNearbyDifferentTurtles
@@ -282,7 +299,10 @@ to-report calculateGroupingForce
       [
         let coorMySelf list ([ xcor ] of myself) ([ ycor ] of myself)
         let coorNearbyTurltles list (xcor) (ycor)
-        let vectorDirector subtract coorMySelf coorNearbyTurltles
+
+        ;let vectorDirector subtract coorMySelf coorNearbyTurltles
+        let coorNearbyTurltlesPrim translationCoord coorNearbyTurltles coorMySelf
+        let vectorDirector subtract coorMySelf coorNearbyTurltlesPrim
 
         let distanceTemp magnitude vectorDirector
 
@@ -303,7 +323,10 @@ to-report calculateGroupingForce
         [
           let coorMySelf list ([ xcor ] of myself) ([ ycor ] of myself)
           let coorNearbyTurltles list (xcor) (ycor)
-          let vectorDirector subtract coorMySelf coorNearbyTurltles
+
+          ;let vectorDirector subtract coorMySelf coorNearbyTurltles
+          let coorNearbyTurltlesPrim translationCoord coorNearbyTurltles coorMySelf
+          let vectorDirector subtract coorMySelf coorNearbyTurltlesPrim
 
           let distanceTemp magnitude vectorDirector
 
@@ -316,6 +339,38 @@ to-report calculateGroupingForce
     ]
   ]
   report groupingForceTemp
+end
+
+to-report translationCoord [coorToChange coorMySelf]
+
+   let distanceTurtles subtract coorMySelf coorToChange
+   let newCoord list (item 0 coorToChange) (item 1 coorToChange)
+
+   if magnitude distanceTurtles > vision
+   [
+     ifelse ( ( item 0 coorMySelf  < 0 ) and ( item 0 coorToChange  > 0 ) )
+     [
+       set newCoord replace-item 0 newCoord (item 0 coorToChange - 70)
+     ]
+     [
+       if ( ( item 0 coorMySelf > 0 ) and ( item 0 coorToChange < 0 ) )
+       [
+         set newCoord replace-item 0 newCoord (item 0 coorToChange + 70)
+       ]
+     ]
+     ifelse ( (item 1 coorMySelf < 0 ) and (item 1 coorToChange > 0 ) )
+     [
+       set newCoord replace-item 1 newCoord (item 1 coorToChange - 70)
+     ]
+     [
+       if ( (item 1  coorMySelf > 0 ) and (item 1 coorToChange < 0 ) )
+       [
+         set newCoord replace-item 1 newCoord (item 1 coorToChange + 70)
+       ]
+     ]
+   ]
+   report newCoord
+
 end
 
 to-report calcGroupColor [ x ]
@@ -360,10 +415,10 @@ to-report normalize [ vector ]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-250
-10
-676
-437
+263
+33
+689
+460
 -1
 -1
 5.9
@@ -429,7 +484,7 @@ numberAgents
 numberAgents
 1.0
 1000.0
-97.0
+100.0
 1.0
 1
 NIL
@@ -443,9 +498,9 @@ SLIDER
 a
 a
 0
-1
-0.0
-0.1
+10
+2.0
+0.2
 1
 Separation Weight
 HORIZONTAL
@@ -458,9 +513,9 @@ SLIDER
 b
 b
 0
-1
+10
 0.0
-0.1
+0.2
 1
 Alignement Weight
 HORIZONTAL
@@ -473,9 +528,9 @@ SLIDER
 c
 c
 0
-1
-0.0
-0.1
+10
+1.2
+0.2
 1
 Cohesion Weight
 HORIZONTAL
@@ -503,8 +558,8 @@ SLIDER
 numberObjects
 numberObjects
 10
-100
-100.0
+1000
+1000.0
 1
 1
 NIL
@@ -635,7 +690,7 @@ numberGroupMax
 numberGroupMax
 1
 6
-6.0
+1.0
 1
 1
 NIL
@@ -649,9 +704,9 @@ SLIDER
 d
 d
 0
-1
-1.0
-0.1
+10
+5.2
+0.2
 1
 Grouping Weight
 HORIZONTAL

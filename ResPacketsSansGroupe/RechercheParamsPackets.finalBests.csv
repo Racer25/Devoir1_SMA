@@ -1,0 +1,4 @@
+"search-number","evaluation","numberagents*","a*","b*","c*","vision*","numberobjects*","objectstrategy*","numberpackets*","numbergroupmax*","d*","num-replicates","best-fitness-so-far"
+"1","500","100","1.6","7.800000000000001","6.800000000000001","10","100","""byPackets""","5","1","0","10","56.6"
+"2","500","100","2.6","5.6000000000000005","8.6","10","100","""byPackets""","5","1","0","10","54.6"
+"3","500","100","5.2","5","7.4","10","100","""byPackets""","5","1","0","10","53.85"

@@ -25,6 +25,7 @@ globals
   ;;Performances Measures
   currentNumberObjects
   ticksToZeroObjects
+  averageAngularVariation
 ]
 
 ;;Method to use before start
@@ -58,6 +59,7 @@ to setup-objects
   clear-patches
   set currentNumberObjects numberObjects
   set ticksToZeroObjects 0
+  set averageAngularVariation 0
   ;;Initialisation of group and color
   ask patches
   [
@@ -182,6 +184,7 @@ to go
     pickUp
     move
   ]
+  calcAverageAngularVariation
   ;; the following line is used to make the turtles
   ;; animate more smoothly.
   repeat 5 [ ask turtles
@@ -375,6 +378,20 @@ to-report translationCoord [coorToChange coorMySelf]
 
 end
 
+to calcAverageAngularVariation
+  set averageAngularVariation 0
+  ask turtles
+  [
+    if any? nearbyTurtles
+    [
+      let headingTurt heading
+      let angularVariation mean ( [abs (headingTurt - heading )] of nearbyTurtles)
+      set averageAngularVariation averageAngularVariation + (angularVariation / count turtles)
+    ]
+  ]
+  show averageAngularVariation
+end
+
 to-report calcGroupColor [ x ]
   report x * 20 + 5
 end
@@ -501,7 +518,7 @@ a
 a
 0
 10
-0.0
+10.0
 0.2
 1
 Separation Weight
@@ -531,7 +548,7 @@ c
 c
 0
 10
-4.2
+0.0
 0.2
 1
 Cohesion Weight
@@ -692,7 +709,7 @@ numberGroupMax
 numberGroupMax
 1
 6
-1.0
+3.0
 1
 1
 NIL

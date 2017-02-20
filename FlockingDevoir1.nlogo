@@ -517,7 +517,7 @@ a
 a
 0
 10
-1.6
+10.0
 0.2
 1
 Separation Weight
@@ -547,7 +547,7 @@ c
 c
 0
 10
-4.2
+0.0
 0.2
 1
 Cohesion Weight
@@ -678,10 +678,10 @@ NIL
 1
 
 MONITOR
-760
-294
-817
-339
+757
+272
+814
+317
 Ticks
 ticksToZeroObjects
 17
@@ -689,10 +689,10 @@ ticksToZeroObjects
 11
 
 MONITOR
-963
-296
-1102
-341
+979
+271
+1118
+316
 currentNumberObjects
 currentNumberObjects
 17
@@ -723,11 +723,29 @@ d
 d
 0
 10
-6.0
+0.0
 0.2
 1
 Grouping Weight
 HORIZONTAL
+
+PLOT
+704
+349
+1138
+506
+Average Angular Variation
+Ticks
+AverageAngularVariation
+0.0
+100.0
+0.0
+100.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -16777216 true "" "plot averageAngularVariation"
 
 @#$#@#$#@
 ## WHAT IS IT?

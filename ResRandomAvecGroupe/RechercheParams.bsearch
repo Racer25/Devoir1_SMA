@@ -25,7 +25,7 @@
 <paramSpec>["vision" 10]</paramSpec>
 <paramSpec>["numberobjects" 100]</paramSpec>
 <paramSpec>["objectstrategy" "byRandom"]</paramSpec>
-<paramSpec>["numberpackets" 4]</paramSpec>
+<paramSpec>["numberpackets" 5]</paramSpec>
 <paramSpec>["numbergroupmax" 5]</paramSpec>
 <paramSpec>["d" [0 0.2 10]]</paramSpec>
 </searchSpace>

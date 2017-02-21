@@ -388,7 +388,7 @@ to calcAverageAngularVariation
       set averageAngularVariation averageAngularVariation + (angularVariation / count turtles)
     ]
   ]
-  show averageAngularVariation
+
 end
 
 to-report calcGroupColor [ x ]
